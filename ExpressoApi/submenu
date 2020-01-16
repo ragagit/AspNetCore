@@ -1,0 +1,8 @@
+Id,Name,Description,Image,MenuId
+1,Cappuccino,"A cappuccino is an espresso-based coffee drink that originated in Italy, and is traditionally prepared with double espresso, and steamed milk foam.",https://s15.postimg.cc/gs8p61egb/cappuccino.jpg,1
+2,Americano,"CaffË Americano is a type of coffee prepared by diluting an espresso with hot water, giving it a similar strength to, but different flavor from traditionally brewed coffee.",https://s15.postimg.cc/nvgklnc63/americano.jpg,1
+3,Mocha,"A caffe mocha, also called mocaccino, is a chocolate-flavored variant of a caffË latte. Other commonly used spellings are mochaccino and also mochachino.",https://s15.postimg.cc/dle5mfh5n/mocha.jpg,1
+4,"Green Tea","Green tea is a type of tea that is made from Camellia sinensis leaves that have not undergone the same withering and oxidation process used to make oolong teas and black teas.",https://i.imgur.com/LmUJk2V.jpg,2
+5,"Back Tea","Black tea is a type of tea that is more oxidized than oolong, green, and white teas.",https://i.imgur.com/aNp2kUe.jpg,2
+6,"Apple Juice","Apple juice is a fruit juice made by the maceration and pressing of an apple.",https://i.imgur.com/cKMstjY.jpg,3
+7,"Orange Juice","Orange juice is the liquid extract of the orange tree fruit, produced by squeezing oranges.",https://i.imgur.com/PC6f3Dc.jpg,3

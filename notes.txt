@@ -1,0 +1,309 @@
+Asp.Net Core
+
+API
+	Application Programming Interface through which software can interact with each 	other
+
+C	Create		POST
+R	Read		GET
+U	Update		PUT
+D	Delete		DELETE
+
+-Open a new instance of Visual Studio
+	open -n -a "Visual Studio"
+
+-Create Models
+	Create new folder
+	Right click and add new class and property
+
+-Create Controllers
+	Right click on Controllers folder -> ASP.NET Core -> Web API Controller Class
+
+-Add routes
+	[HttpGet]
+	[HttpPost]
+	[HttpPut]
+	[HttpDelete]
+
+-Install MySQL and MySQL Workbench
+
+-MYSQL Nugget package
+	Project -> Add NuGet Package
+	MySql.Data.EntityFrameworkCore
+	
+-Create new Data folder and a new class, inherit from DbContext
+
+-Create controller QuotesController
+
+-Create connecting string in Startup.cs
+
+-In Startup.cs Configure() add QuotesDbContext
+
+-Http Status Codes
+	Informartional  100's
+	Successful 200's
+	Redirection 300's
+	Client Error 400's
+	Server Error 500's
+-Content Negotiation
+	The client can decide which formats wants from the server
+	Add header Accept application/json
+	To return in another format we need to add in Startup.cs ConfigureServices AddXmlSerializerFormatters
+	Media Type Formatters are classes that do the data transformation.
+
+-Code First Migration
+	If you schema is not going to change you can use
+		dbContext.Database.EnsureCreated();
+	
+	If the schema changes you need to drop the db first.
+		Right click on project -> tools -> open in terminal
+		dotnet ef database drop
+
+		To run the above package you may need: (Even with this the command didn't work)
+		dotnet tool install --global dotnet-ef
+		dotnet add package Microsoft.EntityFrameworkCore.Design
+		dotnet add package Pomelo.EntityFrameworkCore.MySql --version 3.1.0
+
+		dotnet ef migrations add NameOfYourMigration
+		dotnet ef database update
+
+-Model Validation
+	Data Annotations
+	[Required]
+        [StringLength(50)]
+
+-Routing
+	//api/quotes/Test/1
+        [HttpGet("[action]/{id}")]
+        public int Test(int id)
+        {
+            return id;
+        }
+
+-Sorting and Paging
+	IEnumerable vs IQueryable the difference is in performance
+
+	    IQueryable<Quote> quotes;
+            switch(sort)
+            {
+                case "desc":
+                    quotes = _quotesDbContext.Quotes.OrderByDescending(q => q.CreatedAt);
+                    break;
+                case "asc":
+                    quotes = _quotesDbContext.Quotes.OrderBy(q => q.CreatedAt);
+                    break;
+                default:
+                    quotes = _quotesDbContext.Quotes;
+                    break;
+
+            }
+
+	Paging
+	//Paging
+        [HttpGet("[action]")]
+        public IActionResult PagingQuote(int? pageNumber, int? pageSize)
+        {
+            var quotes = _quotesDbContext.Quotes;
+            var currentPageNumber = pageNumber ?? 1;
+            var currentPageSize = pageSize ?? 5;
+            return Ok(quotes.Skip((currentPageNumber - 1) * currentPageSize).Take(currentPageSize));
+        }	
+
+-Search
+	[HttpGet("[action]")]
+        public IActionResult SearchQuote(string type)
+        {
+            var quotes = _quotesDbContext.Quotes.Where(q => q.Type.StartsWith(type, StringComparison.Ordinal));
+            return Ok(quotes);
+        }
+
+-Caching
+	It is a technique of sorting frequently used data or information in a local memory for a certain time period
+	In startup.cs ConfigureService 
+		services.AddResponseCaching();
+	In startup.cs Configure
+		app.UseResponseCaching();
+
+	In controller.cs
+		[ResponseCache(Duration=60)]
+
+	Cache location
+		Any stored in Client and Server
+		Client stored on the client
+		None neither
+	
+-Security
+	Authentication
+	Authorization
+	https://auth0.com/
+
+	dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer --version 3.0.0
+
+	Create a db connection in auth0.com
+	You can test the connection signing up.
+	Go to Docs Authentication API
+	Get the Postman collection
+	Use DB Connections Signup a username/password
+	Get Client ID from Application -> Settings
+	Get connection from Connections Database
+	
+	Get access token - Resource Owner Password
+	Fill the parameters
+	Enable password authentication by going Application->Advanced Settings 
+
+	if you get:
+	{
+    		"error": "server_error",
+    		"error_description": "Authorization server not configured with default connection."
+	}
+	Go to Tenant Settings -> Default Directory and paste db name
+
+-JWT
+	
+	You can decode your access token with jwt official website.
+
+	https://jwt.io/
+
+	Header - Payload - Signature
+	
+-Restrict access to API
+	[Authorize]
+
+	Use Bearer token in postman
+
+-Issues
+	One user can delete/update records created from another user.
+	Use claims and compare the users, also add userId to the Quote table.
+	string userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
+	Restrict on Get
+	string userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        var quotes = _quotesDbContext.Quotes.Where(q=>q.UserId == userId);
+
+	Anonymous 
+	[AllowAnonymous]
+
+	To ignore a column in the Json response use:
+	[JsonIgnore] 
+	
+-Azure Account
+	Open an account on
+	https://azure.microsoft.com/en-ca/
+
+-Create web app
+	Once the account has been opened go to:
+	Create a resource
+	Web App
+	Choose subscription level
+	Create Resource Group, give a name
+	Give a name
+	Choose Runtime Stack as .NET Core 3.0
+	Click on Review and Create option
+	Wait and go to the bell -> Pin to dashboard
+	Go to the dashboard and open the app
+	
+-Create MySQL Server on Azure
+	Go to the Web app
+	Create a resource
+	Choose database and select MySQL
+	Choose the same Resource Group
+	Fill in user and password
+	Choose storage options
+	Finish and wait to complete
+
+-Connecting Azure MySQL Server with MySQL Workbench
+	In MySQL workbench create a new connection and get the data from Azure
+	In Azure in mySQl got to properties to get the info
+	Give a connection name
+	Click on Store in keychain to enter the password
+	Test Connection
+	
+
+-Adding connection string
+	You can set the connecting string in Startup.cs or appsettings.json
+	Add
+	"ConnectionStrings": {
+		"MySqlConnection": "connection string" // this can be obtain from Azure, just update user/password
+	}
+	
+
+	in Startup.cs
+	services.AddDbContext<QuotesDbContext>(option => option.UseMySQL(Configuration.GetConnectionString("MySqlConnection")));
+
+-Migration
+	In Open in terminal
+	dotnet ef migrations add MigrationName
+	dotnet ef database update
+	
+-Publish Web Api to Azure
+	Right click on project and Publish -> Publish to Azure
+	Select service
+
+-Allow access to Azure Services
+	Inside the Azure MySQL server we need to enable the "Allow Access to Azure Service"
+	Open MySQL then click Connection Security and turn on Allow Access to Azure Services
+	Get the api URL and test
+
+-Documentation with Postman
+	Cmd+Shift+S to save the request
+	then click on the collection ... menu and Publish Docs 
+	
+
+-ExpressApi
+	Tables
+		Menu
+			Cold Drinks
+			Coffee
+			Tea
+
+			PK MenuID
+			   Name
+			   Image
+
+		Submenu
+			PK SubMenuID
+			   Name
+			   Description
+			   Price
+			   Image
+
+		Relationship Menu Submenu is one to many
+
+		Reservation
+			PK ID
+			   Name
+			   Email
+			   Phone
+			   TotalPeople
+			   Date
+			   Time
+
+	Email Regex
+	[RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$")]
+
+
+	Phone Regex
+	[RegularExpression("^[0-9]*$")]
+
+-MenusController
+	api/Menus
+	apu/Menus/1
+
+-ReservationsController
+	api/Reservations
+
+
+
+
+		
+
+
+
+
+
+
+
+
+
+
+
+	
